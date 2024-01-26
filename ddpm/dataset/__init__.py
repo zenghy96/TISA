@@ -1,6 +1,7 @@
 import blobfile as bf
 from torch.utils.data import DataLoader
 from .spine_dataset import UltraDataset
+from .carotid_dataset import CUBSDataset
 
 
 def load_dataset(
@@ -12,7 +13,8 @@ def load_dataset(
     if not data_dir:
         raise ValueError("unspecified datasets directory")
     data_factory = {
-        'ultra': UltraDataset,
+        'spine': UltraDataset,
+        'caroitd': CUBSDataset,
     }
     datafunc = data_factory[data_type]
     dataset = datafunc(data_dir, image_size)

@@ -26,7 +26,6 @@ def get_args():
     parser.add_argument('--img_dir', type=str, default="data/carotid/source/train", help='Directory for image data')
     parser.add_argument('--ann_dir', type=str, default="data/carotid/source/train_label", help='Directory for label')
     parser.add_argument('--save_dir', type=str, default="checkpoints/carotid_unet", help='Path for saving checkpoints')
-    parser.add_argument('--data_type', type=str, default="cubs", help='Type of data')
     parser.add_argument('--checkpoints', type=str, default="", help='Path to checkpoints')
     parser.add_argument('--resume', action='store_true', help='Flag to resume training from checkpoint')
 
