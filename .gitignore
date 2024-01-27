@@ -4,7 +4,8 @@ outputs/
 .vscode/
 others/
 zzz.py
-
+ttda_ultra/
+segmentation/TISA_paper_show.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

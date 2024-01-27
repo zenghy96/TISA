@@ -23,8 +23,7 @@ import argparse
 def get_args():
     parser = argparse.ArgumentParser(description="Training configuration for carotid U-Net Model")
     # path
-    parser.add_argument('--img_dir', type=str, default="data/carotid/source/train", help='Directory for image data')
-    parser.add_argument('--ann_dir', type=str, default="data/carotid/source/train_label", help='Directory for label')
+    parser.add_argument('--data_dir', type=str, default="data/carotid/source", help='Directory for data')
     parser.add_argument('--save_dir', type=str, default="checkpoints/carotid_unet", help='Path for saving checkpoints')
     parser.add_argument('--checkpoints', type=str, default="", help='Path to checkpoints')
     parser.add_argument('--resume', action='store_true', help='Flag to resume training from checkpoint')
@@ -95,8 +94,8 @@ if __name__ == '__main__':
     set_seed(args.seed)
 
     # 2. Create dataset
-    img_paths = list_files(args.img_dir)
-    mask_paths = list_files(args.ann_dir)
+    img_paths = list_files(f"{args.data_dir}/train")
+    mask_paths = list_files(f"{args.data_dir}/train_label")
     n_train = int(len(img_paths)*args.train_percent)
     train_ds = CarotidDataset(img_paths[:n_train], mask_paths[:n_train], args.inp_size, args.n_classes, 'train')
     val_ds = CarotidDataset(img_paths[n_train:], mask_paths[n_train:], args.inp_size, args.n_classes, 'val')

@@ -14,7 +14,7 @@ from models.unet import EvidentialUNet
 from models.model_tools import load_model
 from dataset.carotid_dataset import CarotidDataset, list_files
 from utils.metrics import cal_metrics
-from segmentation.utils.utils import plot_img, set_seed
+from segmentation.utils.utils import plot_img, set_seed, postprocess
 from utils.uncertainty import cal_un_mask_mean
 
 
@@ -22,11 +22,9 @@ from utils.uncertainty import cal_un_mask_mean
 def parse_args():
     parser = argparse.ArgumentParser(description="Configuration for Test Model")
     # Paths
-    parser.add_argument('--img_dir', type=str, default="data/carotid/target/demo", help='Directory for image data')
-    parser.add_argument('--ann_dir', type=str, default="data/carotid/target/demo_label", help='Directory for label')
+    parser.add_argument('--data_dir', type=str, default="data/carotid/target", help='Directory for data')
     parser.add_argument('--output_dir', type=str, default="outputs/carotid_demo", help='Output directory for results')
-    # parser.add_argument('--img_dir', type=str, default="data/carotid/source/train", help='Directory for image data')
-    # parser.add_argument('--ann_dir', type=str, default="data/carotid/source/train_label", help='Directory for label')
+    # parser.add_argument('--data_dir', type=str, default="data/carotid/source", help='Directory for data')
     # parser.add_argument('--output_dir', type=str, default="outputs/carotid_source", help='Output directory for results')
     
     parser.add_argument('--checkpoints', type=str, default="checkpoints/carotid_unet/seed_899/0599.pth.tar", help='Path to model checkpoints')
@@ -56,8 +54,8 @@ if __name__ == '__main__':
     set_seed(args.seed)
 
     # 2. Create dataset
-    img_paths = list_files(args.img_dir)
-    mask_paths = list_files(args.ann_dir)
+    img_paths = list_files(f"{args.data_dir}/demo")
+    mask_paths = list_files(f"{args.data_dir}/demo_label")
     test_ds = CarotidDataset(img_paths, mask_paths, args.inp_size, args.n_class, 'test')
     test_loader = DataLoader(test_ds, batch_size=args.batch_size, shuffle=False, num_workers=4, drop_last=False)
     print(f"load {len(test_ds)} test samples")
@@ -112,6 +110,21 @@ if __name__ == '__main__':
                 plot_img(un_map, cmap='hot', title=f"un_model={un_model:.04f}")
                 plt.savefig(f"{output_dir}/SourceOnly_{imgs_id[i]}.png", bbox_inches='tight', dpi=400, pad_inches=0.1)
                 plt.close()
+
+                # # # # # # # # # # # # # # # #
+                # save figures for paper show
+                # # # # # # # # # # # # # # # #
+                pic_save_dir = 'outputs/paper_show'
+                os.makedirs(pic_save_dir, exist_ok=True)
+                plt.figure(figsize=(4, 4))
+                plt.imshow(pred, cmap='gray')
+                plt.axis('off')
+                plt.savefig(f'{pic_save_dir}/{imgs_id[i]}_source.png', bbox_inches='tight', dpi=400, pad_inches=0)
+                plt.figure(figsize=(4, 4))
+                plt.imshow(un_map, cmap='hot')
+                plt.text(10, 246, f'uncertainty = {un_model:.04f}', color='y', fontsize=12)
+                plt.axis('off')
+                plt.savefig(f'{pic_save_dir}/{imgs_id[i]}_source-un.png', bbox_inches='tight', dpi=400, pad_inches=0)
 
     results = np.array(results)
     print('= '*7 + 'average results' + ' ='*7)

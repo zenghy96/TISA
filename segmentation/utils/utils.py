@@ -1,5 +1,5 @@
 import random
-from matplotlib import pyplot as plt
+from matplotlib import legend, pyplot as plt
 import numpy as np
 import torch
 import cv2
@@ -29,3 +29,11 @@ def postprocess(image, un_map):
             image[labels==delete_label] = 0
             un_map[labels==delete_label] = 0
     return image, un_map
+
+
+def plot_line(upper_polyreg, lower_polyreg, show_start, show_end):
+    x_plot = np.linspace(show_start, show_end, 500)
+    y_plot_upper = upper_polyreg.predict(x_plot.reshape(-1, 1))
+    y_plot_lower = lower_polyreg.predict(x_plot.reshape(-1, 1))
+    plt.plot(x_plot, y_plot_upper, 'r--', linewidth=2, label='LI')
+    plt.plot(x_plot, y_plot_lower, 'g--', linewidth=2, label='MA')
